@@ -1,0 +1,11 @@
+package component:test-component;
+
+/// An example world for the component to target.
+world example {
+    record structure{
+        number: u64,
+        some-str: string
+    }
+
+    export get-structure: func()-> structure;
+}
