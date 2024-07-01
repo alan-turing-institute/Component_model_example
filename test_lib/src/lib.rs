@@ -1,31 +1,18 @@
 use std::cell::RefCell;
 
-use bindings::{
-    exports::component::test_component::resource_interface::GuestTestResource, Guest, Structure,
-};
-// cargo_component_bindings::generate!();
-
-// use crate::bindings::component::test_component::logger::print;
-// use crate::bindings::exports::component::test_component::resource_interface::GuestTestResource;
-// use bindings::{Guest, Structure};
+use bindings::exports::component::test_component::resource_interface::Guest as ExampleResourceInterface;
+use bindings::exports::component::test_component::resource_interface::GuestTestResource as ResourceInterface;
+use bindings::{Guest as ExampleGetStructure, Structure};
 
 mod bindings;
 
-// use bindings::Guest;
+struct Component;
 
-// struct Component;
-
-pub struct TestResource {
+pub struct ExternalResource {
     count: RefCell<u32>,
 }
 
-impl Guest for TestResource {
-    fn get_structure() -> Structure {
-        todo!()
-    }
-}
-
-impl GuestTestResource for TestResource {
+impl ResourceInterface for ExternalResource {
     fn new() -> Self {
         Self {
             count: RefCell::new(0),
@@ -38,19 +25,22 @@ impl GuestTestResource for TestResource {
         self.count.take()
     }
     fn add_one(&self) {
-        // print("adding one");
-        self.count.replace(5);
+        println!("adding one");
+        *self.count.borrow_mut() += 1;
     }
 }
 
-// impl Guest for Component {
-//     fn get_structure() -> Structure {
-//         Structure {
-//             number: 2,
-//             some_str: "test".into(),
-//         }
-//     }
-// }
+impl ExampleResourceInterface for Component {
+    type TestResource = ExternalResource;
+}
 
-// bindings::export!(Component with_types_in bindings);
-bindings::export!(TestResource with_types_in bindings);
+impl ExampleGetStructure for Component {
+    fn get_structure() -> Structure {
+        Structure {
+            number: 100,
+            some_str: "A number for the structure".to_string(),
+        }
+    }
+}
+
+bindings::export!(Component with_types_in bindings);
