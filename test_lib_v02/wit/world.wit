@@ -2,5 +2,16 @@ package component:test-lib-v02;
 
 /// An example world for the component to target.
 world example {
+
+    record structure{
+        number: u64,
+        some-str: string
+    }
+
+    // `record` types are available in the bindings generated so we
+    // do not need to export them as the types are generated from
+    // the callable itself
+    export get-structure: func()-> structure;
+
     export hello-world: func() -> string;
 }
