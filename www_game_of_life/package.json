@@ -7,9 +7,9 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "npm run test:integration && npm run test:unit",
-		"build_wasm_binary":"(cd ../test_lib && cargo component build --release --target wasm32-unknown-unknown)",
-		"build_wasm":"pnpm build_wasm_binary && pnpm jco transpile --no-typescript ../test_lib/target/wasm32-unknown-unknown/release/test_lib.wasm -o src/wasm/",
-		"build_wasm_python": "pnpm build_wasm_binary && (cd ../python && python3 -m wasmtime.bindgen ../test_lib/target/wasm32-unknown-unknown/release/test_lib.wasm --out-dir add)",
+		"build_wasm_binary":"(cd ../pkg_component && cargo component build --release --target wasm32-unknown-unknown)",
+		"build_wasm":"pnpm build_wasm_binary && pnpm jco transpile ../pkg_component/target/wasm32-unknown-unknown/release/pkg_component.wasm -o ./",
+		"build_wasm_python": "pnpm build_wasm_binary && (cd ../python && python3 -m wasmtime.bindgen ../pkg_component/target/wasm32-unknown-unknown/release/pkg_component.wasm --out-dir add)",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
@@ -40,6 +40,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@bytecodealliance/jco": "^1.2.4"
+		"@bytecodealliance/jco": "<1.3"
+		
 	}
 }
+
+

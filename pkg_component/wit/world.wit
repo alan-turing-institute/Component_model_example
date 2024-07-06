@@ -1,0 +1,39 @@
+package component:pkg-component;
+
+interface types {
+    // How to implement this
+    variant cell {
+        dead(u8),
+        alive(u8)
+        
+    }
+
+    record universe-props {
+        width: u32,
+        height: u32,
+        cells: list<u8>
+    }    
+}
+
+
+interface universe {
+    use types.{cell, universe-props};
+    
+    resource universe-resource {
+        constructor();
+        // universe-tick: func(self: borrow<universe-resource>);
+        tick: func();
+        render: func() -> string;
+        width: func() -> u32;
+        height: func() -> u32;
+        get-value: func(idx: u32) -> u8;
+        // TODO: what should this type be?
+        // cells: func() -> pointer<u8>;
+    }
+
+}
+
+/// An example world for the component to target.
+world universe-world {   
+    export universe;
+}
