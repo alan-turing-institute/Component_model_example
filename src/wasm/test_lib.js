@@ -58,6 +58,31 @@ const symbolDispose = Symbol.dispose || Symbol.for('dispose');
 
 const utf8Decoder = new TextDecoder();
 
+const utf8Encoder = new TextEncoder();
+
+let utf8EncodedLen = 0;
+function utf8Encode(s, realloc, memory) {
+  if (typeof s !== 'string') throw new TypeError('expected a string');
+  if (s.length === 0) {
+    utf8EncodedLen = 0;
+    return 1;
+  }
+  let allocLen = 0;
+  let ptr = 0;
+  let writtenTotal = 0;
+  while (s.length > 0) {
+    ptr = realloc(ptr, allocLen, 1, allocLen += s.length * 2);
+    const { read, written } = utf8Encoder.encodeInto(
+    s,
+    new Uint8Array(memory.buffer, ptr + writtenTotal, allocLen - writtenTotal),
+    );
+    writtenTotal += written;
+    s = s.slice(read);
+  }
+  utf8EncodedLen = writtenTotal;
+  return ptr;
+}
+
 
 let exports0;
 let exports1;
@@ -65,6 +90,7 @@ let exports2;
 let memory0;
 let postReturn0;
 let postReturn1;
+let realloc0;
 const handleTable1 = [T_FLAG, 0];
 const finalizationRegistry1 = finalizationRegistryCreate((handle) => {
   const { rep } = rscTableRemove(handleTable1, handle);
@@ -73,6 +99,13 @@ const finalizationRegistry1 = finalizationRegistryCreate((handle) => {
 
 handleTables[1] = handleTable1;
 const trampoline0 = rscTableCreateOwn.bind(null, handleTable1);
+function trampoline1(handle) {
+  const handleEntry = rscTableRemove(handleTable1, handle);
+  if (handleEntry.own) {
+    
+    exports0['0'](handleEntry.rep);
+  }
+}
 
 function getStructure() {
   const ret = exports1['get-structure']();
@@ -86,11 +119,11 @@ function getStructure() {
   };
 }
 
-class TestResource{
+class ResourceCounter{
   constructor() {
-    const ret = exports1['component:test-component/resource-interface#[constructor]test-resource']();
+    const ret = exports1['component:test-component/resource-interface#[constructor]resource-counter']();
     var handle1 = ret;
-    var rsc0 = new.target === TestResource ? this : Object.create(TestResource.prototype);
+    var rsc0 = new.target === ResourceCounter ? this : Object.create(ResourceCounter.prototype);
     Object.defineProperty(rsc0, symbolRscHandle, { writable: true, value: handle1});
     finalizationRegistry1.register(rsc0, handle1, rsc0);
     Object.defineProperty(rsc0, symbolDispose, { writable: true, value: function () {
@@ -104,13 +137,13 @@ class TestResource{
   }
 }
 
-TestResource.prototype.doSomething = function doSomething() {
+ResourceCounter.prototype.doSomething = function doSomething() {
   var handle1 = this[symbolRscHandle];
   if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
-    throw new TypeError('Resource error: Not a valid "TestResource" resource.');
+    throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
   var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
-  const ret = exports1['component:test-component/resource-interface#[method]test-resource.do-something'](handle0);
+  const ret = exports1['component:test-component/resource-interface#[method]resource-counter.do-something'](handle0);
   var ptr2 = dataView(memory0).getInt32(ret + 0, true);
   var len2 = dataView(memory0).getInt32(ret + 4, true);
   var result2 = utf8Decoder.decode(new Uint8Array(memory0.buffer, ptr2, len2));
@@ -118,50 +151,62 @@ TestResource.prototype.doSomething = function doSomething() {
   return result2;
 };
 
-TestResource.prototype.addOne = function addOne() {
+ResourceCounter.prototype.addOne = function addOne() {
   var handle1 = this[symbolRscHandle];
   if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
-    throw new TypeError('Resource error: Not a valid "TestResource" resource.');
+    throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
   var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
-  exports1['component:test-component/resource-interface#[method]test-resource.add-one'](handle0);
+  exports1['component:test-component/resource-interface#[method]resource-counter.add-one'](handle0);
 };
 
-TestResource.prototype.getValue = function getValue() {
+ResourceCounter.prototype.getValue = function getValue() {
   var handle1 = this[symbolRscHandle];
   if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
-    throw new TypeError('Resource error: Not a valid "TestResource" resource.');
+    throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
   var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
-  const ret = exports1['component:test-component/resource-interface#[method]test-resource.get-value'](handle0);
+  const ret = exports1['component:test-component/resource-interface#[method]resource-counter.get-value'](handle0);
   return ret >>> 0;
 };
 
+function myPrintLog(arg0) {
+  var ptr0 = utf8Encode(arg0, realloc0, memory0);
+  var len0 = utf8EncodedLen;
+  exports1['component:test-component/logger#my-print-log'](ptr0, len0);
+}
+
 const $init = (async() => {
   const module0 = fetchCompile(new URL('./test_lib.core.wasm', import.meta.url));
-  const module1 = base64Compile('AGFzbQEAAAABBQFgAX8AAwIBAAQFAXABAQEHEAIBMAAACCRpbXBvcnRzAQAKCwEJACAAQQARAAALAC4JcHJvZHVjZXJzAQxwcm9jZXNzZWQtYnkBDXdpdC1jb21wb25lbnQGMC4xOC4yAGUEbmFtZQATEndpdC1jb21wb25lbnQ6c2hpbQFJAQBGZHRvci1bZXhwb3J0XWNvbXBvbmVudDp0ZXN0LWNvbXBvbmVudC9yZXNvdXJjZS1pbnRlcmZhY2UtdGVzdC1yZXNvdXJjZQ');
-  const module2 = base64Compile('AGFzbQEAAAABBQFgAX8AAhUCAAEwAAAACCRpbXBvcnRzAXABAQEJBwEAQQALAQAALglwcm9kdWNlcnMBDHByb2Nlc3NlZC1ieQENd2l0LWNvbXBvbmVudAYwLjE4LjIAHARuYW1lABUUd2l0LWNvbXBvbmVudDpmaXh1cHM');
+  const module1 = base64Compile('AGFzbQEAAAABBQFgAX8AAwIBAAQFAXABAQEHEAIBMAAACCRpbXBvcnRzAQAKCwEJACAAQQARAAALAC8JcHJvZHVjZXJzAQxwcm9jZXNzZWQtYnkBDXdpdC1jb21wb25lbnQHMC4yMDguMQBoBG5hbWUAExJ3aXQtY29tcG9uZW50OnNoaW0BTAEASWR0b3ItW2V4cG9ydF1jb21wb25lbnQ6dGVzdC1jb21wb25lbnQvcmVzb3VyY2UtaW50ZXJmYWNlLXJlc291cmNlLWNvdW50ZXI');
+  const module2 = base64Compile('AGFzbQEAAAABBQFgAX8AAhUCAAEwAAAACCRpbXBvcnRzAXABAQEJBwEAQQALAQAALwlwcm9kdWNlcnMBDHByb2Nlc3NlZC1ieQENd2l0LWNvbXBvbmVudAcwLjIwOC4xABwEbmFtZQAVFHdpdC1jb21wb25lbnQ6Zml4dXBz');
   ({ exports: exports0 } = await instantiateCore(await module1));
   ({ exports: exports1 } = await instantiateCore(await module0, {
     '[export]component:test-component/resource-interface': {
-      '[resource-new]test-resource': trampoline0,
+      '[resource-drop]resource-counter': trampoline1,
+      '[resource-new]resource-counter': trampoline0,
     },
   }));
   ({ exports: exports2 } = await instantiateCore(await module2, {
     '': {
       $imports: exports0.$imports,
-      '0': exports1['component:test-component/resource-interface#[dtor]test-resource'],
+      '0': exports1['component:test-component/resource-interface#[dtor]resource-counter'],
     },
   }));
   memory0 = exports1.memory;
   postReturn0 = exports1['cabi_post_get-structure'];
-  postReturn1 = exports1['cabi_post_component:test-component/resource-interface#[method]test-resource.do-something'];
+  postReturn1 = exports1['cabi_post_component:test-component/resource-interface#[method]resource-counter.do-something'];
+  realloc0 = exports1.cabi_realloc;
 })();
 
 await $init;
+const logger = {
+  myPrintLog: myPrintLog,
+  
+};
 const resourceInterface = {
-  TestResource: TestResource,
+  ResourceCounter: ResourceCounter,
   
 };
 
-export { resourceInterface, resourceInterface as 'component:test-component/resource-interface', getStructure,  }
+export { logger, resourceInterface, logger as 'component:test-component/logger', resourceInterface as 'component:test-component/resource-interface', getStructure,  }

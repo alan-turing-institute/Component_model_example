@@ -1,8 +1,13 @@
 use std::cell::RefCell;
 
-use bindings::exports::component::test_component::resource_interface::Guest as ExampleResourceInterface;
-use bindings::exports::component::test_component::resource_interface::GuestTestResource as ResourceInterface;
+// Non-exports
 use bindings::{Guest as ExampleGetStructure, Structure};
+
+// Exports
+use bindings::exports::component::test_component::{logger, resource_interface};
+
+use logger::Guest as ExampleLoggerInterface;
+use resource_interface::{Guest as ResourceInterface, GuestResourceCounter as ResourceCounter};
 
 mod bindings;
 
@@ -12,7 +17,7 @@ pub struct ExternalResource {
     count: RefCell<u32>,
 }
 
-impl ResourceInterface for ExternalResource {
+impl ResourceCounter for ExternalResource {
     fn new() -> Self {
         Self {
             count: RefCell::new(0),
@@ -22,7 +27,7 @@ impl ResourceInterface for ExternalResource {
         "something".into()
     }
     fn get_value(&self) -> u32 {
-        self.count.take()
+        *self.count.borrow()
     }
     fn add_one(&self) {
         println!("adding one");
@@ -30,8 +35,14 @@ impl ResourceInterface for ExternalResource {
     }
 }
 
-impl ExampleResourceInterface for Component {
-    type TestResource = ExternalResource;
+impl ResourceInterface for Component {
+    type ResourceCounter = ExternalResource;
+}
+
+impl ExampleLoggerInterface for Component {
+    fn my_print_log(text: String) {
+        println!("Logging: {text}");
+    }
 }
 
 impl ExampleGetStructure for Component {

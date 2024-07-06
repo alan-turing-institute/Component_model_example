@@ -1,35 +1,38 @@
 package component:test-component;
 
 interface resource-interface{
-    resource test-resource{
+    resource resource-counter{
         constructor();
-        do-something:func()->string;
-        add-one:func();
-        get-value: func()->u32;
+        do-something: func() -> string;
+        add-one: func();
+        get-value: func() -> u32;
     }
 }
 
-// interface logger{
-//     print: func(text:string);
-// }
+interface logger{
+    my-print-log: func(text:string);
+}
 
 /// An example world for the component to target.
 world example {
+    import resource-interface;
+    import logger;
+
     record structure{
         number: u64,
         some-str: string
     }
 
     record something-else{
-        s:string
+        s: string
     }
 
-    resource resource-test{
+    resource resource-get-structure{
         constructor();
         get-structure: func(key:string)->structure;
     }
 
     export get-structure: func()-> structure;
     export resource-interface;
-    // import logger;
+    export logger;
 }
