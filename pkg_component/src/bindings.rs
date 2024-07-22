@@ -250,6 +250,39 @@ pub mod exports {
                 }
                 #[doc(hidden)]
                 #[allow(non_snake_case)]
+                pub unsafe fn _export_method_universe_resource_cells_cabi<
+                    T: GuestUniverseResource,
+                >(
+                    arg0: *mut u8,
+                ) -> *mut u8 {
+                    #[cfg(target_arch = "wasm32")]
+                    _rt::run_ctors_once();
+                    let result0 =
+                        T::cells(UniverseResourceBorrow::lift(arg0 as u32 as usize).get());
+                    let ptr1 = _RET_AREA.0.as_mut_ptr().cast::<u8>();
+                    let vec2 = (result0).into_boxed_slice();
+                    let ptr2 = vec2.as_ptr().cast::<u8>();
+                    let len2 = vec2.len();
+                    ::core::mem::forget(vec2);
+                    *ptr1.add(4).cast::<usize>() = len2;
+                    *ptr1.add(0).cast::<*mut u8>() = ptr2.cast_mut();
+                    ptr1
+                }
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                pub unsafe fn __post_return_method_universe_resource_cells<
+                    T: GuestUniverseResource,
+                >(
+                    arg0: *mut u8,
+                ) {
+                    let l0 = *arg0.add(0).cast::<*mut u8>();
+                    let l1 = *arg0.add(4).cast::<usize>();
+                    let base2 = l0;
+                    let len2 = l1;
+                    _rt::cabi_dealloc(base2, len2 * 1, 1);
+                }
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
                 pub unsafe fn _export_method_universe_resource_get_value_cabi<
                     T: GuestUniverseResource,
                 >(
@@ -313,11 +346,13 @@ pub mod exports {
                     }
 
                     fn new() -> Self;
-                    /// universe-tick: func(self: borrow<universe-resource>);
                     fn tick(&self);
                     fn render(&self) -> _rt::String;
                     fn width(&self) -> u32;
                     fn height(&self) -> u32;
+                    /// TODO: is it possible to return a pointer to the cells instead?
+                    /// cells: func() -> pointer<list<u8>>;
+                    fn cells(&self) -> _rt::Vec<u8>;
                     fn get_value(&self, idx: u32) -> u8;
                 }
                 #[doc(hidden)]
@@ -348,6 +383,14 @@ pub mod exports {
     #[export_name = "component:pkg-component/universe#[method]universe-resource.height"]
     unsafe extern "C" fn export_method_universe_resource_height(arg0: *mut u8,) -> i32 {
       $($path_to_types)*::_export_method_universe_resource_height_cabi::<<$ty as $($path_to_types)*::Guest>::UniverseResource>(arg0)
+    }
+    #[export_name = "component:pkg-component/universe#[method]universe-resource.cells"]
+    unsafe extern "C" fn export_method_universe_resource_cells(arg0: *mut u8,) -> *mut u8 {
+      $($path_to_types)*::_export_method_universe_resource_cells_cabi::<<$ty as $($path_to_types)*::Guest>::UniverseResource>(arg0)
+    }
+    #[export_name = "cabi_post_component:pkg-component/universe#[method]universe-resource.cells"]
+    unsafe extern "C" fn _post_return_method_universe_resource_cells(arg0: *mut u8,) {
+      $($path_to_types)*::__post_return_method_universe_resource_cells::<<$ty as $($path_to_types)*::Guest>::UniverseResource>(arg0)
     }
     #[export_name = "component:pkg-component/universe#[method]universe-resource.get-value"]
     unsafe extern "C" fn export_method_universe_resource_get_value(arg0: *mut u8,arg1: i32,) -> i32 {
@@ -556,6 +599,7 @@ mod _rt {
             self as i32
         }
     }
+    pub use alloc_crate::vec::Vec;
     extern crate alloc as alloc_crate;
     pub use alloc_crate::alloc;
 }
@@ -591,22 +635,21 @@ pub(crate) use __export_universe_world_impl as export;
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.25.0:universe-world:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 707] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xbe\x04\x01A\x02\x01\
-A\x06\x01B\x05\x01q\x02\x04dead\x01}\0\x05alive\x01}\0\x04\0\x04cell\x03\0\0\x01\
-p}\x01r\x03\x05widthy\x06heighty\x05cells\x02\x04\0\x0euniverse-props\x03\0\x03\x03\
-\x01\x1dcomponent:pkg-component/types\x05\0\x02\x03\0\0\x04cell\x02\x03\0\0\x0eu\
-niverse-props\x01B\x12\x02\x03\x02\x01\x01\x04\0\x04cell\x03\0\0\x02\x03\x02\x01\
-\x02\x04\0\x0euniverse-props\x03\0\x02\x04\0\x11universe-resource\x03\x01\x01i\x04\
-\x01@\0\0\x05\x04\0\x1e[constructor]universe-resource\x01\x06\x01h\x04\x01@\x01\x04\
-self\x07\x01\0\x04\0\x1e[method]universe-resource.tick\x01\x08\x01@\x01\x04self\x07\
-\0s\x04\0\x20[method]universe-resource.render\x01\x09\x01@\x01\x04self\x07\0y\x04\
-\0\x1f[method]universe-resource.width\x01\x0a\x04\0\x20[method]universe-resource\
-.height\x01\x0a\x01@\x02\x04self\x07\x03idxy\0}\x04\0#[method]universe-resource.\
-get-value\x01\x0b\x04\x01\x20component:pkg-component/universe\x05\x03\x04\x01&co\
-mponent:pkg-component/universe-world\x04\0\x0b\x14\x01\0\x0euniverse-world\x03\0\
-\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.208.1\x10wit-bi\
-ndgen-rust\x060.25.0";
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 665] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x94\x04\x01A\x02\x01\
+A\x05\x01B\x02\x01q\x02\x04dead\x01}\0\x05alive\x01}\0\x04\0\x04cell\x03\0\0\x03\
+\x01\x1dcomponent:pkg-component/types\x05\0\x02\x03\0\0\x04cell\x01B\x13\x02\x03\
+\x02\x01\x01\x04\0\x04cell\x03\0\0\x04\0\x11universe-resource\x03\x01\x01i\x02\x01\
+@\0\0\x03\x04\0\x1e[constructor]universe-resource\x01\x04\x01h\x02\x01@\x01\x04s\
+elf\x05\x01\0\x04\0\x1e[method]universe-resource.tick\x01\x06\x01@\x01\x04self\x05\
+\0s\x04\0\x20[method]universe-resource.render\x01\x07\x01@\x01\x04self\x05\0y\x04\
+\0\x1f[method]universe-resource.width\x01\x08\x04\0\x20[method]universe-resource\
+.height\x01\x08\x01p}\x01@\x01\x04self\x05\0\x09\x04\0\x1f[method]universe-resou\
+rce.cells\x01\x0a\x01@\x02\x04self\x05\x03idxy\0}\x04\0#[method]universe-resourc\
+e.get-value\x01\x0b\x04\x01\x20component:pkg-component/universe\x05\x02\x04\x01&\
+component:pkg-component/universe-world\x04\0\x0b\x14\x01\0\x0euniverse-world\x03\
+\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.208.1\x10wit-\
+bindgen-rust\x060.25.0";
 
 #[inline(never)]
 #[doc(hidden)]

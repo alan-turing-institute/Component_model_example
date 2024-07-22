@@ -52,17 +52,18 @@ const getIndex = (row, column) => {
 };
 
 const drawCells = () => {
-	// No cells buffer now
-	// const cellsPtr = universe.cells();
-	// const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
-	// const zero = new Uint8Array(memory.buffer, 0, width * height);
-
 	ctx.beginPath();
 
+	// Get state of cells from universe instance
+	const cells = universe_instance.cells();
 	for (let row = 0; row < height; row++) {
 		for (let col = 0; col < width; col++) {
 			const idx = getIndex(row, col);
-			const val = universe_instance.getValue(idx);
+			// Can either get value from idx inside call
+			// const val = universe_instance.getValue(idx);
+			// OR
+			// index into cells cloned from Wasm
+			const val = cells[idx];
 
 			ctx.fillStyle = val == 0 ? DEAD_COLOR : ALIVE_COLOR;
 

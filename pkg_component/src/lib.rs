@@ -141,6 +141,16 @@ impl GuestUniverseResource for Universe {
         self.height
     }
 
+    fn cells(&self) -> Vec<u8> {
+        self.cells.borrow().iter().fold(vec![], |mut acc, cell| {
+            acc.push(match cell {
+                Cell::Alive => 1,
+                Cell::Dead => 0,
+            });
+            acc
+        })
+    }
+
     fn get_value(&self, idx: u32) -> u8 {
         match (*self.cells.borrow())[usize::try_from(idx).unwrap()] {
             Cell::Alive => 1,
