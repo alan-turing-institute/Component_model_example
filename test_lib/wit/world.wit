@@ -13,23 +13,24 @@ interface logger{
     my-print-log: func(text:string);
 }
 
+
+// Since this is not exported, does not have to be included
+// interface resource-get-structure-interface {
+//     resource resource-get-structure{
+//         constructor();
+//         get-structure: func(key:string)->structure;
+//     }
+// }
+
 /// An example world for the component to target.
 world example {
-    import resource-interface;
-    import logger;
+    // Since these interfaces exist locally, import not required
+    // import resource-interface;
+    // import logger;
 
     record structure{
         number: u64,
         some-str: string
-    }
-
-    record something-else{
-        s: string
-    }
-
-    resource resource-get-structure{
-        constructor();
-        get-structure: func(key:string)->structure;
     }
 
     export get-structure: func()-> structure;

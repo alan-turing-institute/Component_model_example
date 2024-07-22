@@ -63,7 +63,9 @@ pub unsafe fn __post_return_hello_world<T: Guest>(arg0: *mut u8) {
     _rt::cabi_dealloc(l0, l1, 1);
 }
 pub trait Guest {
-    /// export structure;
+    /// `record` types are available in the bindings generated so we
+    /// do not need to export them as the types are generated from
+    /// the callable itself
     fn get_structure() -> Structure;
     fn hello_world() -> _rt::String;
 }

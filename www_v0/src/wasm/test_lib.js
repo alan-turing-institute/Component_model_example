@@ -91,16 +91,16 @@ let memory0;
 let postReturn0;
 let postReturn1;
 let realloc0;
-const handleTable1 = [T_FLAG, 0];
-const finalizationRegistry1 = finalizationRegistryCreate((handle) => {
-  const { rep } = rscTableRemove(handleTable1, handle);
+const handleTable0 = [T_FLAG, 0];
+const finalizationRegistry0 = finalizationRegistryCreate((handle) => {
+  const { rep } = rscTableRemove(handleTable0, handle);
   exports0['0'](rep);
 });
 
-handleTables[1] = handleTable1;
-const trampoline0 = rscTableCreateOwn.bind(null, handleTable1);
+handleTables[0] = handleTable0;
+const trampoline0 = rscTableCreateOwn.bind(null, handleTable0);
 function trampoline1(handle) {
-  const handleEntry = rscTableRemove(handleTable1, handle);
+  const handleEntry = rscTableRemove(handleTable0, handle);
   if (handleEntry.own) {
     
     exports0['0'](handleEntry.rep);
@@ -125,13 +125,13 @@ class ResourceCounter{
     var handle1 = ret;
     var rsc0 = new.target === ResourceCounter ? this : Object.create(ResourceCounter.prototype);
     Object.defineProperty(rsc0, symbolRscHandle, { writable: true, value: handle1});
-    finalizationRegistry1.register(rsc0, handle1, rsc0);
+    finalizationRegistry0.register(rsc0, handle1, rsc0);
     Object.defineProperty(rsc0, symbolDispose, { writable: true, value: function () {
-      finalizationRegistry1.unregister(rsc0);
-      rscTableRemove(handleTable1, handle1);
+      finalizationRegistry0.unregister(rsc0);
+      rscTableRemove(handleTable0, handle1);
       rsc0[symbolDispose] = emptyFunc;
       rsc0[symbolRscHandle] = null;
-      exports0['0'](handleTable1[(handle1 << 1) + 1] & ~T_FLAG);
+      exports0['0'](handleTable0[(handle1 << 1) + 1] & ~T_FLAG);
     }});
     return rsc0;
   }
@@ -139,10 +139,10 @@ class ResourceCounter{
 
 ResourceCounter.prototype.doSomething = function doSomething() {
   var handle1 = this[symbolRscHandle];
-  if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
+  if (!handle1 || (handleTable0[(handle1 << 1) + 1] & T_FLAG) === 0) {
     throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
-  var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
+  var handle0 = handleTable0[(handle1 << 1) + 1] & ~T_FLAG;
   const ret = exports1['component:test-component/resource-interface#[method]resource-counter.do-something'](handle0);
   var ptr2 = dataView(memory0).getInt32(ret + 0, true);
   var len2 = dataView(memory0).getInt32(ret + 4, true);
@@ -153,19 +153,19 @@ ResourceCounter.prototype.doSomething = function doSomething() {
 
 ResourceCounter.prototype.addOne = function addOne() {
   var handle1 = this[symbolRscHandle];
-  if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
+  if (!handle1 || (handleTable0[(handle1 << 1) + 1] & T_FLAG) === 0) {
     throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
-  var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
+  var handle0 = handleTable0[(handle1 << 1) + 1] & ~T_FLAG;
   exports1['component:test-component/resource-interface#[method]resource-counter.add-one'](handle0);
 };
 
 ResourceCounter.prototype.getValue = function getValue() {
   var handle1 = this[symbolRscHandle];
-  if (!handle1 || (handleTable1[(handle1 << 1) + 1] & T_FLAG) === 0) {
+  if (!handle1 || (handleTable0[(handle1 << 1) + 1] & T_FLAG) === 0) {
     throw new TypeError('Resource error: Not a valid "ResourceCounter" resource.');
   }
-  var handle0 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
+  var handle0 = handleTable0[(handle1 << 1) + 1] & ~T_FLAG;
   const ret = exports1['component:test-component/resource-interface#[method]resource-counter.get-value'](handle0);
   return ret >>> 0;
 };
